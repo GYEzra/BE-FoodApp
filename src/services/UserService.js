@@ -4,7 +4,7 @@ const aqp = require('api-query-params');
 const gUser = async (limit, page, queryString) => {
     try {
         let result = null;
-        if (limit && page) {
+        if (limit && page || queryString) {
             let offset = (page - 1) * limit;
             const { filter } = aqp(queryString);
             delete filter.page;
@@ -30,11 +30,10 @@ const cUser = async (data) => {
 
 const uUser = async (data) => {
     try {
-        console.log(data)
         let result = await User.updateOne({ _id: data._id }, {
             fullname: data.fullname,
             email: data.email,
-            phone: data.phoneNumber,
+            phone: data.phone,
             address: data.address,
             gender: data.gender
         });

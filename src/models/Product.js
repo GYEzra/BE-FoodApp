@@ -1,10 +1,10 @@
-const { default: mongoose } = require('mongoose')
+const { default: mongoose } = require('mongoose');
+const mongoose_delete = require('mongoose-delete');
 
 const productSchema = new mongoose.Schema({
     name: {
         type: String,
-        require: true,
-        unique: true
+        require: true
     },
     image: {
         type: String,
@@ -26,6 +26,8 @@ const productSchema = new mongoose.Schema({
         type: String
     }
 }, { timestamps: true });
+
+productSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
 const Product = mongoose.model('product', productSchema);
 
 module.exports = Product

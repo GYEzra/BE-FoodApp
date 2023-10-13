@@ -5,7 +5,7 @@ const getAllOrder = async (req, res) => {
     let page = req.query.page;
     let result = null;
 
-    if (limit && page) {
+    if (limit && page || req.query) {
         result = await gOrder(limit, page, req.query);
     } else {
         result = await gOrder();

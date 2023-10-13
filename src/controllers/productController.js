@@ -1,5 +1,5 @@
 const Product = require('../models/Product.js')
-const { gProduct, cProduct, uProduct, dProduct } = require('../services/ProductService.js')
+const { gProduct, cProduct, uProduct, dProduct, gProducts } = require('../services/ProductService.js')
 
 
 const getAllProduct = async (req, res) => {
@@ -7,10 +7,10 @@ const getAllProduct = async (req, res) => {
     let page = req.query.page;
     let result = null;
 
-    if (limit && page) {
-        result = await gProduct(limit, page, req.query);
+    if (limit && page || req.query) {
+        result = await gProducts(limit, page, req.query);
     } else {
-        result = await gProduct();
+        result = await gProducts();
     }
 
     return res.status(200).json(
@@ -21,9 +21,21 @@ const getAllProduct = async (req, res) => {
     )
 }
 
-const createProduct = async (req, res) => {
-    let result = await cProduct(req.body);
+const getProduct = async (req, res) => {
+    const id = req.params.id;
 
+    let result = await gProduct(id);
+    return res.status(200).json(
+        {
+            EC: 0,
+            data: result
+        }
+    )
+}
+
+const createProduct = async (req, res) => {
+
+    let result = await cProduct(req.body);
     return res.status(200).json(
         {
             EC: 0,
@@ -44,7 +56,9 @@ const updateProduct = async (req, res) => {
 }
 
 const deleteProduct = async (req, res) => {
-    let result = await dProduct(req.body.id);
+    let result = await dProduct(req.params.id);
+
+    console.log(result)
 
     return res.status(200).json(
         {
@@ -56,5 +70,5 @@ const deleteProduct = async (req, res) => {
 
 
 module.exports = {
-    getAllProduct, createProduct, updateProduct, deleteProduct
+    getAllProduct, createProduct, updateProduct, deleteProduct, getProduct
 }

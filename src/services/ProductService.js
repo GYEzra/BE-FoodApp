@@ -1,10 +1,10 @@
 const Product = require('../models/Product.js')
 const aqp = require('api-query-params');
 
-const gProduct = async (limit, page, queryString) => {
+const gProducts = async (limit, page, queryString) => {
     try {
         let result = null;
-        if (limit && page) {
+        if (limit && page || queryString) {
             let offset = (page - 1) * limit;
             const { filter } = aqp(queryString);
             delete filter.page;
@@ -13,6 +13,15 @@ const gProduct = async (limit, page, queryString) => {
         } else {
             result = await Product.find({});
         }
+        return result;
+    } catch (error) {
+        return error;
+    }
+}
+
+const gProduct = async (id) => {
+    try {
+        let result = await Product.find({ _id: id });
         return result;
     } catch (error) {
         return error;
@@ -47,5 +56,5 @@ const dProduct = async (id) => {
 }
 
 module.exports = {
-    gProduct, cProduct, uProduct, dProduct
+    gProduct, cProduct, uProduct, dProduct, gProducts
 }

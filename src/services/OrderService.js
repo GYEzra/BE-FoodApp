@@ -4,7 +4,7 @@ const aqp = require('api-query-params');
 const gOrder = async (limit, page, queryString) => {
     try {
         let result = null;
-        if (limit && page) {
+        if (limit && page || queryString) {
             let offset = (page - 1) * limit;
             const { filter } = aqp(queryString);
             delete filter.page;
