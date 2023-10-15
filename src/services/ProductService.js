@@ -9,9 +9,13 @@ const gProducts = async (limit, page, queryString) => {
             const { filter } = aqp(queryString);
             delete filter.page;
 
-            result = await Product.find(filter).skip(offset).limit(limit).exec();
+            result = await Product.find(filter)
+                .skip(offset)
+                .limit(limit)
+                .populate('categories')
+                .exec();
         } else {
-            result = await Product.find({});
+            result = await Product.find({}).populate('categories');
         }
         return result;
     } catch (error) {
@@ -21,7 +25,7 @@ const gProducts = async (limit, page, queryString) => {
 
 const gProduct = async (id) => {
     try {
-        let result = await Product.find({ _id: id });
+        let result = await Product.find({ _id: id }).populate('categories');
         return result;
     } catch (error) {
         return error;
