@@ -2,7 +2,7 @@ const express = require('express')
 const routerAPI = express.Router()
 const { postCreateUser, updateUser, deleteUser, getAllUser } = require('../controllers/userController');
 const { getAllProduct, createProduct, updateProduct, deleteProduct, getProduct } = require('../controllers/productController');
-const { getAllOrder, createOrder, updateOrder, deleteOrder } = require('../controllers/OrderController');
+const { getAllOrder, createOrder, updateOrder, deleteOrder, getOrder } = require('../controllers/OrderController');
 const { getAllCategory, createCategory, updateCategory, deleteCategory } = require('../controllers/catetoryController');
 
 routerAPI.get('/users', getAllUser)
@@ -17,6 +17,7 @@ routerAPI.put('/products', updateProduct)
 routerAPI.delete('/products/:id', deleteProduct)
 
 routerAPI.get('/orders', getAllOrder)
+routerAPI.get('/orders/:id', getOrder)
 routerAPI.post('/orders', createOrder)
 routerAPI.put('/orders', updateOrder)
 routerAPI.delete('/orders', deleteOrder)

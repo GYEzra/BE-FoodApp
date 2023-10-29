@@ -1,7 +1,7 @@
 const Order = require('../models/Order.js');
 const aqp = require('api-query-params');
 
-const gOrder = async (limit, page, queryString) => {
+const getAll = async (limit, page, queryString) => {
     try {
         let result = null;
         if (limit && page || queryString) {
@@ -9,9 +9,13 @@ const gOrder = async (limit, page, queryString) => {
             const { filter } = aqp(queryString);
             delete filter.page;
 
-            result = await Order.find(filter).skip(offset).limit(limit).exec();
+            result = await Order.find(filter)
+                .skip(offset)
+                .limit(limit)
+                .populate(['userId', 'cart.product'])
+                .exec();
         } else {
-            result = await Order.find({});
+            result = await Order.find({}).populate(['userId', 'cart.product']);
         }
         return result;
     } catch (error) {
@@ -19,33 +23,36 @@ const gOrder = async (limit, page, queryString) => {
     }
 }
 
-const cOrder = async (data) => {
+const get = async (_id) => {
+    return await Order.findOne({ _id }).populate(['userId', 'cart.product']);
+}
+
+const create = async (data) => {
     try {
-        let result = await Order.create(data);
+        let result = await Order.create({ ...data });
         return result;
     } catch (error) {
-        return error;
+        return null;
     }
 }
 
-const uOrder = async (data) => {
+const update = async (data) => {
     try {
-        let result = await Order.updateOne({ _id: data.id }, { ...data });
-        return result
+        return await Order.updateOne({ _id: data._id }, { ...data });
     } catch (error) {
-        return error;
+        return null;
     }
 }
 
-const dOrder = async (id) => {
+const remove = async (id) => {
     try {
         let result = await Order.deleteById(id);
         return result
     } catch (error) {
-        return error;
+        return null;
     }
 }
 
 module.exports = {
-    gOrder, cOrder, uOrder, dOrder
+    getAll, get, update, remove, create
 }

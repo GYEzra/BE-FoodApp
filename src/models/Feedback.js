@@ -1,4 +1,5 @@
-const { default: mongoose } = require('mongoose');
+const { default: mongoose } = require('mongoose')
+const mongoose_delete = require('mongoose-delete');
 
 const feedbackSchema = new mongoose.Schema({
     product: {
@@ -16,6 +17,7 @@ const feedbackSchema = new mongoose.Schema({
     note: String
 }, { timestamps: true });
 
+feedbackSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
 const Order = mongoose.model('feedback', feedbackSchema);
 
 module.exports = Order

@@ -25,7 +25,7 @@ const gProducts = async (limit, page, queryString) => {
 
 const gProduct = async (id) => {
     try {
-        let result = await Product.find({ _id: id }).populate('categories');
+        let result = await Product.findOne({ _id: id }).populate('categories');
         return result;
     } catch (error) {
         return error;
