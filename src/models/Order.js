@@ -46,7 +46,11 @@ const orderSchema = new mongoose.Schema({
             type: Number,
             reuqired: true
         }
-    }]
+    }],
+    voucher: {
+        type: mongoose.ObjectId,
+        ref: 'voucher'
+    }
 }, { timestamps: true });
 
 orderSchema.plugin(mongoose_delete, { overrideMethods: 'all' });

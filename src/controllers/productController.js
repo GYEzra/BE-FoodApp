@@ -12,6 +12,7 @@ const getAllProduct = async (req, res) => {
     } else {
         result = await gProducts();
     }
+    console.log(result)
 
     return res.status(200).json(
         {

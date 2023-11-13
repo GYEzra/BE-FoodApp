@@ -2,13 +2,13 @@ const { default: mongoose } = require('mongoose')
 const mongoose_delete = require('mongoose-delete');
 
 const feedbackSchema = new mongoose.Schema({
-    product: {
-        type: mongoose.ObjectId,
-        ref: 'product'
-    },
     user: {
         type: mongoose.ObjectId,
         ref: 'user'
+    },
+    product: {
+        type: mongoose.ObjectId,
+        ref: 'product'
     },
     score: {
         type: Number,
@@ -18,6 +18,6 @@ const feedbackSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 feedbackSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
-const Order = mongoose.model('feedback', feedbackSchema);
+const Feedback = mongoose.model('feedback', feedbackSchema);
 
-module.exports = Order
+module.exports = Feedback

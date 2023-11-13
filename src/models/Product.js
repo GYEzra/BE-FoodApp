@@ -24,7 +24,11 @@ const productSchema = new mongoose.Schema({
     },
     description: {
         type: String
-    }
+    },
+    feedbacks: [{
+        type: mongoose.ObjectId,
+        ref: 'feedback',
+    }]
 }, { timestamps: true });
 
 productSchema.plugin(mongoose_delete, { overrideMethods: 'all' });

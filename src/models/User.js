@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-    fullname: {
+    name: {
         type: String,
         require: true
     },
@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
     phone: String,
     address: String,
     gender: String,
+    status: {
+        type: String,
+        require: true
+    },
+    refresh_token: String
 }, { timestamps: true });
 
 userSchema.plugin(mongoose_delete, { overrideMethods: 'all' });

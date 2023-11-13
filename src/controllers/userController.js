@@ -1,13 +1,12 @@
 const { query } = require('express');
-const { gUser, cUser, uUser, dUser, loggedIn } = require('../services/UserService')
+const { gUser, cUser, uUser, dUser, handleGetUser } = require('../services/UserService')
 
 const getAllUser = async (req, res) => {
     let limit = req.query.limit;
     let page = req.query.page;
     let result = null;
-    console.log(req.query)
 
-    if (limit && page || req.query) {
+    if (limit && page) {
         result = await gUser(limit, page, req.query);
     } else {
         result = await gUser();
@@ -21,20 +20,14 @@ const getAllUser = async (req, res) => {
     )
 }
 
-const postCreateUser = async (req, res) => {
-    const type = req.body.type;
-
-    let result = null;
-    if (type === "CREATE-USER") {
-        result = await cUser(req.body);
-    } else {
-        result = await loggedIn(req.body);
-    }
+const getUser = async (res, req) => {
+    let _id = req.params._id;
+    const user = await handleGetUser(_id);
 
     return res.status(200).json(
         {
             EC: 0,
-            data: result
+            data: user
         }
     )
 }
@@ -51,7 +44,8 @@ const updateUser = async (req, res) => {
 }
 
 const deleteUser = async (req, res) => {
-    let result = await dUser(req.body.id);
+    const _id = req.params.id;
+    let result = await dUser(_id);
 
     return res.status(200).json(
         {
@@ -62,5 +56,5 @@ const deleteUser = async (req, res) => {
 }
 
 module.exports = {
-    postCreateUser, updateUser, deleteUser, getAllUser
+    updateUser, deleteUser, getAllUser, getUser
 }

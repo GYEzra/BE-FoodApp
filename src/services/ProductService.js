@@ -13,9 +13,10 @@ const gProducts = async (limit, page, queryString) => {
                 .skip(offset)
                 .limit(limit)
                 .populate('categories')
+                .populate('feedbacks')
                 .exec();
         } else {
-            result = await Product.find({}).populate('categories');
+            result = await Product.find({}).populate('categories').populate('feedbacks');
         }
         return result;
     } catch (error) {
@@ -25,7 +26,9 @@ const gProducts = async (limit, page, queryString) => {
 
 const gProduct = async (id) => {
     try {
-        let result = await Product.findOne({ _id: id }).populate('categories');
+        let result = await Product.findOne({ _id: id })
+            .populate('categories')
+            .populate('feedbacks');
         return result;
     } catch (error) {
         return error;
@@ -43,7 +46,7 @@ const cProduct = async (data) => {
 
 const uProduct = async (data) => {
     try {
-        let result = await Product.updateOne({ _id: data.id }, { ...data });
+        let result = await Product.updateOne({ _id: data._id }, { ...data });
         return result
     } catch (error) {
         return error;

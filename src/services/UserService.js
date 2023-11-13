@@ -1,17 +1,20 @@
 const User = require('../models/User.js')
 const aqp = require('api-query-params');
+const { checkUsernameExist, getHashPassword } = require('./AuthService.js')
 
 const gUser = async (limit, page, queryString) => {
     try {
         let result = null;
-        if (limit && page || queryString) {
+        if (limit && page) {
             let offset = (page - 1) * limit;
             const { filter } = aqp(queryString);
-            delete filter.page;
 
-            result = await User.find(filter).skip(offset).limit(limit).exec();
+            result = await User.find(filter)
+                .skip(offset)
+                .limit(limit)
+                .exec();
         } else {
-            result = await User.find({});
+            result = await User.find({ role: 'Khách hàng' });
         }
         return result;
     } catch (error) {
@@ -19,48 +22,32 @@ const gUser = async (limit, page, queryString) => {
     }
 }
 
-const cUser = async (data) => {
-    try {
-        let result = await User.create(data);
-        return result;
-    } catch (error) {
-        return error;
-    }
+const handleGetUser = async (_id) => {
+    return await User.findOne({ _id });
 }
 
 const uUser = async (data) => {
     try {
         let result = await User.updateOne({ _id: data._id }, {
-            fullname: data.fullname,
-            email: data.email,
-            phone: data.phone,
-            address: data.address,
-            gender: data.gender
+            ...data
         });
         return result
     } catch (error) {
+        console.log(error)
         return error;
     }
 }
 
-const dUser = async (id) => {
+const dUser = async (_id) => {
     try {
-        let result = await User.deleteById(id);
+        let result = await User.deleteById(_id);
         return result
     } catch (error) {
         return error;
-    }
-}
-
-const loggedIn = async (data) => {
-    try {
-        return await User.find({ username: data.username, password: data.password });
-    } catch (error) {
-        return error
     }
 }
 
 
 module.exports = {
-    gUser, cUser, uUser, dUser, loggedIn
+    gUser, uUser, dUser, handleGetUser
 }

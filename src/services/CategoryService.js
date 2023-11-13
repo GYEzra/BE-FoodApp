@@ -15,11 +15,14 @@ const gCategory = async (limit, page, queryString) => {
         }
         return result;
     } catch (error) {
+
+        console.log(error)
         return error;
     }
 }
 
 const cCategory = async (data) => {
+    console.log(data)
     try {
         const checkCategory = await Category.find({ name: data.name });
         if (checkCategory.length > 0) {
@@ -28,6 +31,7 @@ const cCategory = async (data) => {
             return await Category.create(data);
         }
     } catch (error) {
+        console.log(error)
         return error;
     }
 }
@@ -38,7 +42,7 @@ const uCategory = async (data) => {
         if (checkCategory.length > 0) {
             return null;
         } else {
-            const result = await Category.updateOne({ _id: data.id }, {
+            const result = await Category.updateOne({ _id: data._id }, {
                 name: data.name,
                 description: data.description
             });

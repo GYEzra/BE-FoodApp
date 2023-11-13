@@ -1,5 +1,6 @@
 const Order = require('../models/Order.js');
 const aqp = require('api-query-params');
+const { uProduct } = require('../services/ProductService.js')
 
 const getAll = async (limit, page, queryString) => {
     try {
@@ -14,11 +15,13 @@ const getAll = async (limit, page, queryString) => {
                 .limit(limit)
                 .populate(['userId', 'cart.product'])
                 .exec();
+            console.log(result)
         } else {
             result = await Order.find({}).populate(['userId', 'cart.product']);
         }
         return result;
     } catch (error) {
+        console.log(error)
         return error;
     }
 }
@@ -28,12 +31,15 @@ const get = async (_id) => {
 }
 
 const create = async (data) => {
+    let result = null;
     try {
-        let result = await Order.create({ ...data });
-        return result;
+        let cart = data.cart;
+        processQuantityStock(cart);
+        result = await Order.create({ ...data });
     } catch (error) {
-        return null;
+        console.log(error);
     }
+    return result;
 }
 
 const update = async (data) => {
@@ -53,6 +59,13 @@ const remove = async (id) => {
     }
 }
 
+const processQuantityStock = async (cart) => {
+    for (let i = 0; i < cart.length; i++) {
+        let cartItem = cart[i];
+        cartItem.product.quantity -= cartItem.quantity;
+        await uProduct(cartItem.product);
+    }
+}
 module.exports = {
     getAll, get, update, remove, create
 }
