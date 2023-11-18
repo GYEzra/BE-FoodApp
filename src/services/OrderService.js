@@ -1,6 +1,8 @@
 const Order = require('../models/Order.js');
 const aqp = require('api-query-params');
-const { uProduct } = require('../services/ProductService.js')
+const { uProduct } = require('../services/ProductService.js');
+const { gVoucher, uVoucher } = require('../services/VoucherService.js');
+const { isValidObjectId } = require('mongoose');
 
 const getAll = async (limit, page, queryString) => {
     try {
@@ -13,11 +15,11 @@ const getAll = async (limit, page, queryString) => {
             result = await Order.find(filter)
                 .skip(offset)
                 .limit(limit)
-                .populate(['userId', 'cart.product'])
+                .populate(['userId', 'cart.product', 'voucher'])
                 .exec();
             console.log(result)
         } else {
-            result = await Order.find({}).populate(['userId', 'cart.product']);
+            result = await Order.find({}).populate(['userId', 'cart.product', 'voucher']);
         }
         return result;
     } catch (error) {
@@ -27,18 +29,38 @@ const getAll = async (limit, page, queryString) => {
 }
 
 const get = async (_id) => {
-    return await Order.findOne({ _id }).populate(['userId', 'cart.product']);
+    if (isValidObjectId(_id)) {
+        return await Order.findOne({ _id }).populate(['userId', 'cart.product', 'voucher']);
+    }
+    return null;
 }
 
 const create = async (data) => {
     let result = null;
     try {
-        let cart = data.cart;
-        processQuantityStock(cart);
-        result = await Order.create({ ...data });
+        let order = await Order.create({ ...data });
+
+        if (order) {
+            processQuantityStock(data.cart);
+
+            if (data.voucher) {
+                let voucher = await gVoucher(data.voucher);
+
+                let dataUpdated = {
+                    _id: data.voucher,
+                    quantity: voucher.quantity - 1
+                }
+
+                await uVoucher(dataUpdated);
+            }
+
+            result = order;
+        }
+
     } catch (error) {
         console.log(error);
     }
+
     return result;
 }
 

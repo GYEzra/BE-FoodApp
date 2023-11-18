@@ -9,13 +9,13 @@ const handleCreatePayment = async (data) => {
     let secretkey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
     let requestId = partnerCode + new Date().getTime();
     let orderInfo = "Thanh toán bằng Momo";
-    let ipnUrl = "http:localhost:4200/checkout-result";
-    let redirectUrl = "http:localhost:4200"
+    let ipnUrl = "http:localhost:4200";
+    let redirectUrl = "http:localhost:4200/checkout-result"
     let requestType = "captureWallet"
     let extraData = "";
     let lang = "vi";
     let amount = data.totalPrice;
-    let orderId = data._id;
+    let orderId = data._id + '-' + new Date().getTime();
 
     let rawSignature =
         "accessKey=" + accessKey +

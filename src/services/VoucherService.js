@@ -1,4 +1,5 @@
 const Voucher = require('../models/Voucher.js')
+const Order = require('../models/Order.js')
 const aqp = require('api-query-params');
 
 const gVouchers = async (limit, page, queryString) => {
@@ -6,12 +7,15 @@ const gVouchers = async (limit, page, queryString) => {
         let result = null;
         if (limit && page || queryString) {
             let offset = (page - 1) * limit;
-            const { filter } = aqp(queryString);
+            const { filter, sort } = aqp(queryString);
             delete filter.page;
+            console.log(sort)
+            console.log(filter)
 
             result = await Voucher.find(filter)
                 .skip(offset)
                 .limit(limit)
+                .sort(sort)
                 .exec();
         } else {
             result = await Voucher.find({});
@@ -24,7 +28,7 @@ const gVouchers = async (limit, page, queryString) => {
 
 const gVoucher = async (id) => {
     try {
-        let result = await Voucher.findOne({ _id: id })
+        let result = await Voucher.findOne({ _id: id });
         return result;
     } catch (error) {
         return error;
@@ -33,10 +37,58 @@ const gVoucher = async (id) => {
 
 const cVoucher = async (data) => {
     try {
-        let result = await Voucher.create(data);
-        return result;
+        let voucher = await Voucher.findOne({ code: data.code });
+        let errorMessage = null;
+
+        if (data.type === "CREATE-VOUCHER") {
+            if (!voucher) {
+                let result = await Voucher.create(data);
+                return result;
+            } else {
+                errorMessage = 'Mã khuyến mãi đã tồn tại';
+            }
+        }
+
+        if (data.type === "APPLY-VOUCHER") {
+            if (voucher) {
+                let expiredTime = voucher.expired_date.getTime();
+                let currentTime = new Date().getTime();
+
+                if (voucher.status === 'Còn hiệu lực' && voucher.quantity > 0 && expiredTime >= currentTime) {
+                    let order = await Order.findOne({ userId: data.userId, voucher: voucher._id });
+
+                    if (!order) {
+                        return {
+                            EC: 0,
+                            data: voucher
+                        }
+                    } else {
+                        errorMessage = 'Mã khuyến mãi đã được sử dụng'
+                    }
+
+                } else {
+                    if (!(voucher.status === 'Còn hiệu lực'))
+                        errorMessage = 'Mã khuyến mãi đã hết hạn';
+                    else if (expiredTime < currentTime)
+                        errorMessage = 'Mã khuyến mãi đã hết hạn';
+                    else if (voucher.quantity <= 0)
+                        errorMessage = 'Số lượng khuyến mãi đã hết';
+                }
+            } else {
+                errorMessage = 'Mã khuyến mãi không hợp lệ';
+            }
+        }
+
+        return {
+            EC: -1,
+            errorMessage
+        }
+
     } catch (error) {
-        return error;
+        return {
+            EC: -1,
+            errorMessage: 'Lỗi hệ thống'
+        };
     }
 }
 

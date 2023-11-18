@@ -6,10 +6,7 @@ const voucherSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-    type: {
-        type: String,
-        require: true
-    },
+    description: String,
     discount: {
         type: Number,
         require: true
